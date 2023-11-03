@@ -23,6 +23,8 @@ const int rodata2 = 230;
 
 auto main(int argc, char **argv) -> int
 {
+    int stack;
+    int stack2;
      /**
      * The {fmt} lib is a cross platform library for printing and formatting text
      * it is much more convenient than std::cout and printf
@@ -34,6 +36,8 @@ auto main(int argc, char **argv) -> int
     fmt::print("Value of variable data {} adress of variable data {} \n",data2, fmt::ptr(&data2));
     fmt::print("Value of variable rodata {} adress of variable rodata {} \n",rodata, fmt::ptr(&rodata));
     fmt::print("Value of variable rodata {} adress of variable rodata {} \n",rodata2, fmt::ptr(&rodata2));
+    fmt::print("Value of variable stack {} adress of variable stack {} \n",stack, fmt::ptr(&stack));
+    fmt::print("Value of variable stack2 {} adress of variable stack2 {} \n",stack2, fmt::ptr(&stack2));
     
     return 0; /* exit gracefully*/
 }
