@@ -17,6 +17,7 @@ int data2 = 320;
 
 // .rodata segment
 const int rodata = 4711;
+const int rodata2 = 230;
 
 
 
@@ -32,6 +33,7 @@ auto main(int argc, char **argv) -> int
     fmt::print("Value of variable data {} adress of variable data {} \n",data, fmt::ptr(&data));
     fmt::print("Value of variable data {} adress of variable data {} \n",data2, fmt::ptr(&data2));
     fmt::print("Value of variable rodata {} adress of variable rodata {} \n",rodata, fmt::ptr(&rodata));
+    fmt::print("Value of variable rodata {} adress of variable rodata {} \n",rodata2, fmt::ptr(&rodata2));
     
     return 0; /* exit gracefully*/
 }
