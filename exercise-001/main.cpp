@@ -9,12 +9,14 @@
 
 // .bss segment
 int bss;
+int bss2 = 230;
 
 // .data segment
 int data = 4711;
 
 // .rodata segment
 const int rodata = 4711;
+
 
 
 auto main(int argc, char **argv) -> int
@@ -25,6 +27,7 @@ auto main(int argc, char **argv) -> int
      * More info at https://fmt.dev/latest/api.html
      */
     fmt::print("Value of variable bss {} adress of variable bss {} \n",bss, fmt::ptr(&bss));
+    fmt::print("Value of variable bss {} adress of variable bss2 {} \n",bss, fmt::ptr(&bss2));
     fmt::print("Value of variable data {} adress of variable data {} \n",data, fmt::ptr(&data));
     fmt::print("Value of variable rodata {} adress of variable rodata {} \n",rodata, fmt::ptr(&rodata));
     
