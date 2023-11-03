@@ -7,6 +7,7 @@
 #include "CLI/CLI.hpp"
 #include "config.h"
 int foo;
+int foo2;
 
 auto main(int argc, char **argv) -> int
 {
