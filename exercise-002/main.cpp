@@ -37,17 +37,16 @@ auto main(int argc, char **argv) -> int
         std::cout << "Nr. " << cup+1 << ":\t" << data[cup] << " " << "\n";
     }
     
+    auto start = std::chrono::system_clock::now();
     std::sort(data.begin(),data.end());
+    auto end = std::chrono::system_clock::now();
+    
     fmt::print("sortierte Zahlen:\n");
     for (int cup = 0; cup < count; cup++) {
         std::cout << "Nr. " << cup+1 << ":\t" << data[cup] << " " << "\n";
     }
     fmt::print("Die Variable count: %d \n",count);
 
-
-    auto start = std::chrono::system_clock::now();
-
-    auto end = std::chrono::system_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
     fmt::print("Ausgabe der Zeit: {}\n", elapsed);
 
