@@ -27,25 +27,25 @@ auto main(int argc, char **argv) -> int
     std::vector<int> data(count);
     fmt::print("Created a vector with {} elements\n", data.size());
 
-    for(int i = 0; i< count; i++)
+    for(int &i : data)
     {
-        data[i] = rand()%100;
+        i = rand()%100+1;
     }
 
     std::cout << "Vector data: \n";
-    for (int cup = 0; cup < count; cup++) {
-        std::cout << "Nr. " << cup+1 << ":\t" << data[cup] << " " << "\n";
+    for (int cup : data) {
+        std::cout << cup << "\t";        
     }
     
     auto start = std::chrono::system_clock::now();
     std::sort(data.begin(),data.end());
     auto end = std::chrono::system_clock::now();
     
-    fmt::print("sortierte Zahlen:\n");
-    for (int cup = 0; cup < count; cup++) {
-        std::cout << "Nr. " << cup+1 << ":\t" << data[cup] << " " << "\n";
+    fmt::print("\nsortierte Zahlen:\n");
+    for (int cup : data) {
+        std::cout << cup << "\t" ;
     }
-    fmt::print("Die Variable count: %d \n",count);
+    fmt::print("\nDie Variable count: {}\n",count);
 
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
     fmt::print("Ausgabe der Zeit: {}\n", elapsed);
