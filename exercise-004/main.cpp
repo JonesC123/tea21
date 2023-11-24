@@ -6,8 +6,6 @@
 
 #include "bmp.h"
 #include <fstream>
-#include <iostream>
-using namespace std;
 
 auto main(int argc, char **argv) -> int
 {
@@ -37,7 +35,6 @@ auto main(int argc, char **argv) -> int
 
     /* INSERT YOUR CODE HERE */
     BMP test;
-
     test.read(filename);
 
     return 0; /* exit gracefully*/

@@ -1,51 +1,106 @@
 #include "bmp.h"
 #include <fstream>
-#include <iostream>
 #include <fmt/format.h>
 #include <vector>
+#include <iostream>
 
+template<typename T>
+static void read_value(std::fstream& file,T* value )
+{
+    file.read(reinterpret_cast<char*>(value), sizeof(T));
+}
+
+// Funktion zur Darstellung des Graustufenvektors als ASCII-Bild
+void displayAsciiImage(const std::vector<uint8_t>& grey_buffer, int width, int height) {
+    // Zeichen zur Darstellung der Graustufen (hier einfach gehalten)
+    const std::string ascii_chars = "@%#*+=-:. ";
+    
+    // Schleife über den Graustufenvektor
+    for (int j = 0; j < height; j++){
+        for (int i = 0; i < width; ++i) {
+        // Bestimme den entsprechenden ASCII-Charakter basierend auf dem Grauwert
+        int index = grey_buffer[i+j*width] * (ascii_chars.size() - 1) / 255;
+        char ascii_char = ascii_chars[index];
+        
+        // Ausgabe des ASCII-Zeichens
+        std::cout << ascii_char;
+        
+        // Zeilenumbruch nach jeder Zeile entsprechend der Bildbreite
+        if ((i + 1) % width == 0) {
+            std::cout << std::endl;
+        }
+    }
+    }
+    
+}
 
 // Definition der Funktion function1
 bool BMP::read(const std::string& filename) {
     // open a file in read mode.
-    auto ret = false;
-    std::ifstream infile; 
-    infile.open(filename); 
+    auto ret = false; 
+    
+    std::fstream input_file(filename, std::ios::binary | std::ios::in); 
+    if (!input_file.is_open()) {
+        fmt::print("Unable to open the file: {}\n",filename);
+        return ret;
+    }
     BITMAPFILEHEADER file_header;
-    infile >> file_header.bfType;
-    infile >> file_header.bfSize;
-    infile >> file_header.bfReserved;
-    infile >> file_header.bfOffBits;
+    read_value(input_file,&file_header.bfType);
+    read_value(input_file,&file_header.bfSize);
+    read_value(input_file,&file_header.bfReserved);
+    read_value(input_file,&file_header.bfOffBits);
+
     BITMAPINFOHEADER info_header;
-    infile >> info_header.biSize;
-    infile >> info_header.biWidth;
-    infile >> info_header.biHeight;
-    infile >> info_header.biPlanes;
-    infile >> info_header.biBitCount;
-    infile >> info_header.biCompression;
-    infile >> info_header.biSizeImage;
-    infile >> info_header.biXPelsPerMeter;
-    infile >> info_header.biYPelsPerMeter;
-    infile >> info_header.biClrUsed;
-    infile >> info_header.biClrImportant;
+    read_value(input_file,&info_header.biSize);
+    read_value(input_file,&info_header.biWidth);
+    read_value(input_file,&info_header.biHeight);
+    read_value(input_file,&info_header.biPlanes);
+    read_value(input_file,&info_header.biBitCount);
+    read_value(input_file,&info_header.biCompression);
+    read_value(input_file,&info_header.biSizeImage);
+    read_value(input_file,&info_header.biXPelsPerMeter);
+    read_value(input_file,&info_header.biYPelsPerMeter);
+    read_value(input_file,&info_header.biClrUsed);
+    read_value(input_file,&info_header.biClrImportant);
+
+    fmt::println("Type: {}", file_header.bfType);
+    fmt::println("Size Header: {}", file_header.bfSize);
+    fmt::println("Bits: {}", file_header.bfOffBits);
+    fmt::println("Reserved: {}", file_header.bfReserved);
+    fmt::println("Width: {}", info_header.biWidth);
+    fmt::println("Height: {}", info_header.biHeight);
+    fmt::println("BitCount: {}", info_header.biBitCount);
+    fmt::println("ClrImportant: {}", info_header.biClrImportant);
+    fmt::println("ClrUsed: {}", info_header.biClrUsed);
+    fmt::println("Compression: {}", info_header.biCompression);
+    fmt::println("Planes: {}", info_header.biPlanes);
+    fmt::println("Size Info: {}", info_header.biSize);
+    fmt::println("SizeImage: {}", info_header.biSizeImage);
+    fmt::println("XPelsPerMeter: {}", info_header.biXPelsPerMeter);
+    fmt::println("YPelsPerMeter: {}", info_header.biYPelsPerMeter);
 
     int buffer_size = info_header.biWidth*info_header.biHeight; //Breite mal Höhe aus dem Bild
+    fmt::println("Buffer Size {}", buffer_size);
     std::vector<pixel> pixel_buffer(buffer_size);
-    for(int i; i < buffer_size+1; i++ ){
-        infile >> pixel_buffer[i].red;
-        infile >> pixel_buffer[i].green;
-        infile >> pixel_buffer[i].blue;
+    for(int i = 0; i < buffer_size; i++ ){
+        uint8_t padding = 0;
+        input_file >> pixel_buffer[i].red;
+        input_file >> pixel_buffer[i].green;
+        input_file >> pixel_buffer[i].blue;
+        input_file >> padding;
     }
+    std::vector<uint8_t> grey_buffer(buffer_size);
+    for(int j = 0; j< buffer_size; j++)
+    {
+        grey_buffer[j] = pixel_buffer[j].grey();
+    }
+    displayAsciiImage(grey_buffer,info_header.biWidth, info_header.biHeight);
+    return ret;
 
-   if (infile.is_open()) { 
-        // was will ich hier machen?
-        infile.close(); // Schließe die Datei nach dem Lesen
-        return true; // Rückgabewert true, wenn das Lesen erfolgreich war
-    } else {
-        fmt::format("Einlesen fehlgeschlagen");
-        return false; // Rückgabewert false, wenn das Lesen fehlgeschlagen ist
-    }
-   return ret;
+    /*for (int i = 0; i<buffer_size; i++){
+        fmt::println("Grey Buffer {}", grey_buffer[i]);
+    }*/
+    
   
 }
 
@@ -53,8 +108,17 @@ bool BMP::read(const std::string& filename) {
 bool BMP::write(const std::string& filename) {
     auto ret = false;
     std::ifstream infile;
-    std::cout << "Reading from the file" << std::endl; 
+    //std::cout << "Reading from the file" << std::endl; 
     //infile >> data; 
     //cout << data << endl;
     return ret;
 }
+
+
+
+/*void BMP::BitmapFileHeader::print()
+{
+fmt::println("Bitmap File Info Header:");
+fmt::println("The start {}{}", bfType[0], bfType[1];)
+
+}*/
