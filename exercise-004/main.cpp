@@ -20,7 +20,7 @@ auto main(int argc, char **argv) -> int
     try
     {
         app.set_version_flag("-V,--version", fmt::format("{} {}", PROJECT_VER, PROJECT_BUILD_DATE));
-        app.add_option("-f,--Format", filename, fmt::format("Der Filename ist: {}", filename));
+        app.add_option("-f,--format", filename, fmt::format("Der Filename ist: {}", filename));
         app.parse(argc, argv);
     }
     catch (const CLI::ParseError &e)
