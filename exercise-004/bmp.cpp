@@ -19,17 +19,17 @@ void displayAsciiImage(const std::vector<uint8_t>& grey_buffer, int width, int h
     for (int j = 0; j < height; j++){
         for (int i = 0; i < width; ++i) {
         // Bestimme den entsprechenden ASCII-Charakter basierend auf dem Grauwert
-        int index = grey_buffer[i+j*width] * (ascii_chars.size() - 1) / 255;
+        int index = grey_buffer[i+(height-j)*width] * (ascii_chars.size() - 1) / 255;
         char ascii_char = ascii_chars[index];
         
         // Ausgabe des ASCII-Zeichens
         std::cout << ascii_char;
         
-        // Zeilenumbruch nach jeder Zeile entsprechend der Bildbreite
+        /*// Zeilenumbruch nach jeder Zeile entsprechend der Bildbreite
         if ((i + 1) % width == 0) {
-            std::cout << std::endl;
-        }
+        }*/
     }
+            std::cout << std::endl;
     }
     
 }
@@ -82,12 +82,20 @@ bool BMP::read(const std::string& filename) {
     int buffer_size = info_header.biWidth*info_header.biHeight; //Breite mal Höhe aus dem Bild
     fmt::println("Buffer Size {}", buffer_size);
     std::vector<pixel> pixel_buffer(buffer_size);
-    for(int i = 0; i < buffer_size; i++ ){
-        uint8_t padding = 0;
-        input_file >> pixel_buffer[i].red;
-        input_file >> pixel_buffer[i].green;
-        input_file >> pixel_buffer[i].blue;
-        input_file >> padding;
+    int width_len = info_header.biWidth*3;
+    int padding_len = 4- width_len%4;
+    
+    for(int j = 0; j <info_header.biHeight; j++){
+        for(int i = 0; i < info_header.biWidth; i++ ){
+            //uint8_t padding = 0;
+            read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].red);
+            read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].green);
+            read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].blue);           
+            //input_file >> padding;
+        }
+        for (int x=0; x < padding_len; x++ ){
+            input_file >> pixel_buffer[j].alpha;
+        }        
     }
     std::vector<uint8_t> grey_buffer(buffer_size);
     for(int j = 0; j< buffer_size; j++)
