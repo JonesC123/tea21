@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-template<typename T>
+template<typename T> // mit dem T ist es egal welcher Datentyp vorliegt
 static void read_value(std::fstream& file,T* value )
 {
     file.read(reinterpret_cast<char*>(value), sizeof(T));
@@ -13,23 +13,20 @@ static void read_value(std::fstream& file,T* value )
 // Funktion zur Darstellung des Graustufenvektors als ASCII-Bild
 void displayAsciiImage(const std::vector<uint8_t>& grey_buffer, int width, int height) {
     // Zeichen zur Darstellung der Graustufen (hier einfach gehalten)
-    const std::string ascii_chars = "@%#*+=-:. ";
+    const std::string ascii_chars = " .:-+*#%@"; // @%#*+=-:.
     
     // Schleife über den Graustufenvektor
-    for (int j = 0; j < height; j++){
-        for (int i = 0; i < width; ++i) {
-        // Bestimme den entsprechenden ASCII-Charakter basierend auf dem Grauwert
-        int index = grey_buffer[i+(height-j)*width] * (ascii_chars.size() - 1) / 255;
-        char ascii_char = ascii_chars[index];
-        
-        // Ausgabe des ASCII-Zeichens
-        std::cout << ascii_char;
-        
-        /*// Zeilenumbruch nach jeder Zeile entsprechend der Bildbreite
-        if ((i + 1) % width == 0) {
-        }*/
-    }
-            std::cout << std::endl;
+    for (int j = 0; j < height; j++){   //for-Schleife über die Hoehe des Bildes
+
+        for (int i = 0; i < width; ++i) {   //for-Schleife über die Breite des Bildes        // ASCII-Charakter basierend auf dem Grauwert
+            int index = grey_buffer[i+(height-j)*width] * (ascii_chars.size() - 1) / 255; // height-j dreht das Bild
+            //int index = grey_buffer[i+j*width] * (ascii_chars.size() - 1) / 255; hier steht das bild auf dem Kop
+            char ascii_char = ascii_chars[index];
+            
+            // Ausgabe des ASCII-Zeichens
+            std::cout << ascii_char;
+        }
+        std::cout << std::endl;
     }
     
 }
@@ -82,51 +79,36 @@ bool BMP::read(const std::string& filename) {
     int buffer_size = info_header.biWidth*info_header.biHeight; //Breite mal Höhe aus dem Bild
     fmt::println("Buffer Size {}", buffer_size);
     std::vector<pixel> pixel_buffer(buffer_size);
-    int width_len = info_header.biWidth*3;
-    int padding_len = 4- width_len%4;
+
+    int width_len = info_header.biWidth*3;  // mal drei, wegen den drei Pixelfarben
+    int padding_len = 4-width_len%4;        // modulo 4 gibt den Rest, das 4-%4 beschreibt die auffülbits um eine durch 4teilbare Zahl zu bekommen
+    fmt::println("padding Laenge: {}", padding_len);
     
     for(int j = 0; j <info_header.biHeight; j++){
         for(int i = 0; i < info_header.biWidth; i++ ){
-            //uint8_t padding = 0;
-            read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].red);
+            // Speichern der Werte in den pixelbuffer
+            read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].red);         // Spalte + die durchgelaufenen Spalten
             read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].green);
             read_value(input_file, &pixel_buffer[i+j*info_header.biWidth].blue);           
-            //input_file >> padding;
         }
+        // SChreiben der Paddingwerte einer Zeile in den Trash, die ueberschuessigen 1-3 Werte
         for (int x=0; x < padding_len; x++ ){
-            input_file >> pixel_buffer[j].alpha;
+            read_value(input_file, &pixel_buffer[j].trash);
         }        
     }
     std::vector<uint8_t> grey_buffer(buffer_size);
     for(int j = 0; j< buffer_size; j++)
     {
-        grey_buffer[j] = pixel_buffer[j].grey();
+        // hier wird der gefüllte Pixelbuffer über die Funktion grey zu einem Grauwert umgerechnet
+        grey_buffer[j] = pixel_buffer[j].grey(); // die funktion grey() funktioniert ohne Eingabewerte, weil sie rot,grün und blau aus der Klasse kennt
     }
+    // grey_buffer enthält für jeden Pixel einen Wert zw. 0-255 für den Grauwert
+    //fmt::println("länge grey_buffer: {}", size(grey_buffer));
+    //fmt::println("grey_buffer 1: {}", grey_buffer[10000]);
     displayAsciiImage(grey_buffer,info_header.biWidth, info_header.biHeight);
-    return ret;
-
-    /*for (int i = 0; i<buffer_size; i++){
-        fmt::println("Grey Buffer {}", grey_buffer[i]);
-    }*/
-    
-  
-}
-
-// Definition der Funktion function2
-bool BMP::write(const std::string& filename) {
-    auto ret = false;
-    std::ifstream infile;
-    //std::cout << "Reading from the file" << std::endl; 
-    //infile >> data; 
-    //cout << data << endl;
-    return ret;
+    return ret; 
 }
 
 
 
-/*void BMP::BitmapFileHeader::print()
-{
-fmt::println("Bitmap File Info Header:");
-fmt::println("The start {}{}", bfType[0], bfType[1];)
 
-}*/

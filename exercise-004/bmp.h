@@ -7,9 +7,8 @@
 class BMP {
     public:
         bool read(const std::string&  filename);
-        bool write(const std::string&  filename);
+        //bool write(const std::string&  filename);
         //void displayAsciiImage(const std::vector<uint8_t>& grey_buffer, int width);
-        //void print();
     private:  
         struct BITMAPFILEHEADER {
             uint16_t bfType;        // Dateityp-Kennung (z.B. 'BM' für Windows-Bitmap)
@@ -35,7 +34,7 @@ class BMP {
             uint8_t red;
             uint8_t green;
             uint8_t blue;
-            uint8_t alpha;
+            uint8_t trash;
             uint8_t grey(){
                 return (pixel::red +pixel::green +pixel::blue)/3;
             }
